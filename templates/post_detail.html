@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>    
+   
+</head>
+<body>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+         </ul>   
+    {% endif %}
+        
+    <h1>
+        {{ title }} is working <br>
+     </h1> 
+     
+     {{instance.id}}<br>
+     {{instance.title}}<br>
+     {{instance.content}}<br>
+     {{instance.updated}}<br>
+     {{instance.timestamp}}<br>
+     <br>
+   
+     
+</body>
+</html>
