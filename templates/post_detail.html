@@ -1,28 +1,22 @@
-<!DOCTYPE html>
-<html>
-<head>    
-   
-</head>
-<body>
-    {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-            {% endfor %}
-         </ul>   
-    {% endif %}
-        
+{% extends "base.html"%}
+
+{% block head_title %}
+    {{instance.title}} | 
+    {{block.super}} 
+           
+{% endblock head_title %}
+<!--parent class bata content lyako by using super-->
+    
+{% block content%} 
+
+<div class="col-sm-6 col-sm-offset-3">     
+        {% if obj.image %}
+    <img src="{{instance.image.url}}" class="img-responsive"/>
+    {{% endif %}}
     <h1>
-        {{ title }} is working <br>
-     </h1> 
+        {{ title }} <small>{{instance.timestamp}}</small><br>
+     </h1>       
+     {{instance.content|linebreaks}}<br>   <!--to include line breaks-->
+</div>
+{% endblock content%}
      
-     {{instance.id}}<br>
-     {{instance.title}}<br>
-     {{instance.content}}<br>
-     {{instance.updated}}<br>
-     {{instance.timestamp}}<br>
-     <br>
-   
-     
-</body>
-</html>
