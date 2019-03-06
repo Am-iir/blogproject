@@ -1,13 +1,16 @@
 from django.contrib import messages
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect,Http404
 from django.shortcuts import render,get_object_or_404, redirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
 
 from .models import Post
 from .forms import PostForm
 # Create your views here.
 
 def post_create(request): #takes request and returns response Create
+   if not request.user.is_staff or not request.user.is_superuser:
+      raise Http404
    form=PostForm(request.POST or None , request.FILES or None)
    if form.is_valid():
       instance=form.save(commit=False)
@@ -31,6 +34,13 @@ def post_create(request): #takes request and returns response Create
 
 def post_list(request): #List
    queryset_list = Post.objects.all()#.order_by("-timestamp")
+
+   query=request.GET.get("q")
+   if query:
+      queryset_list=queryset_list.filter(
+         Q(title__icontains=query) |
+         Q(content__icontains=query)
+      ).distinct()
    paginator = Paginator(queryset_list, 4) # Show 4 contacts per page
    page_request_var="page"
    page = request.GET.get('page_request_var')
@@ -61,6 +71,8 @@ def post_list(request): #List
    
 
 def post_update(request,id=None): #Update
+   if not request.user.is_staff or not request.user.is_superuser:
+      raise Http404
    instance =get_object_or_404(Post, id=id)
    form=PostForm(request.POST or None, request.FILES or None , instance=instance)
    if form.is_valid():
@@ -78,15 +90,17 @@ def post_update(request,id=None): #Update
    }
    return render(request,"post_form.html",context)
     
-def post_delete(request, id=None): #Delete
-   instance =get_object_or_404(Post, id=id)
+def post_delete(request, slug=None): #Delete
+   if not request.user.is_staff or not request.user.is_superuser:
+      raise Http404
+   instance =get_object_or_404(Post, slug=slug)
    instance.delete()
    messages.success(request,"Sucessfully deleted")
    return redirect("posts:list")
     
-def post_detail(request,id=None): #Detail retrieve
+def post_detail(request,slug=None): #Detail retrieve
    #instance = Post.objects.get(id=2)
-   instance =get_object_or_404(Post, id=id)
+   instance =get_object_or_404(Post, slug=slug)
    context = {
       "title":instance.title,
       "instance":instance
